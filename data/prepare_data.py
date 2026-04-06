@@ -23,29 +23,22 @@ def generate_synthetic_data(n_samples=15000):
     brands = {
         # Премиальные и массовые иномарки (Toyota, BMW, Mercedes, Hyundai, Kia и др.)
         # Средняя цена 2,28 млн руб (иномарки с пробегом) [citation:2][citation:10]
-        'Toyota': {'models': ['Camry', 'Corolla', 'RAV4', 'Land Cruiser Prado'], 'segment': 'import',
-                   'base_price': 2_280_000},
-        'BMW': {'models': ['X5', 'X3', '5 Series', '3 Series'], 'segment': 'import', 'base_price': 2_280_000},
-        'Mercedes-Benz': {'models': ['E-Class', 'GLE', 'C-Class', 'GLC'], 'segment': 'import', 'base_price': 2_280_000},
-        'Hyundai': {'models': ['Solaris', 'Creta', 'Santa Fe', 'Tucson'], 'segment': 'import', 'base_price': 2_280_000},
-        'Kia': {'models': ['Rio', 'Sportage', 'Sorento', 'K5'], 'segment': 'import', 'base_price': 2_280_000},
-        'Volkswagen': {'models': ['Polo', 'Tiguan', 'Passat', 'Jetta'], 'segment': 'import', 'base_price': 2_280_000},
-        'Nissan': {'models': ['Qashqai', 'X-Trail', 'Almera', 'Juke'], 'segment': 'import', 'base_price': 2_280_000},
-        'Skoda': {'models': ['Octavia', 'Rapid', 'Kodiaq', 'Karoq'], 'segment': 'import', 'base_price': 2_280_000},
-        'Mazda': {'models': ['CX-5', 'CX-30', '6', '3'], 'segment': 'import', 'base_price': 2_280_000},
+        # ИНОМАРКИ (реально ~2.2–2.5 млн)
+    'Toyota': {'models': ['Camry', 'Corolla', 'RAV4'], 'base_price': 2_400_000},
+    'BMW': {'models': ['X5', 'X3', '3 Series'], 'base_price': 2_600_000},
+    'Mercedes': {'models': ['E-Class', 'C-Class'], 'base_price': 2_700_000},
+    'Hyundai': {'models': ['Solaris', 'Creta'], 'base_price': 2_100_000},
+    'Kia': {'models': ['Rio', 'Sportage'], 'base_price': 2_050_000},
+    'Volkswagen': {'models': ['Polo', 'Tiguan'], 'base_price': 2_200_000},
 
-        # Китайские автомобили — средняя цена 2,12 млн руб [citation:2][citation:10]
-        'Chery': {'models': ['Tiggo 4', 'Tiggo 7 Pro', 'Tiggo 8', 'Arrizo 8'], 'segment': 'chinese',
-                  'base_price': 2_120_000},
-        'Geely': {'models': ['Coolray', 'Atlas Pro', 'Tugella', 'Monjaro'], 'segment': 'chinese',
-                  'base_price': 2_120_000},
-        'Haval': {'models': ['Jolion', 'F7', 'F7x', 'Dargo'], 'segment': 'chinese', 'base_price': 2_120_000},
-        'Changan': {'models': ['Alsvin', 'CS35 Plus', 'CS55', 'UNI-K'], 'segment': 'chinese', 'base_price': 2_120_000},
-        'Exeed': {'models': ['LX', 'TX', 'VX', 'RX'], 'segment': 'chinese', 'base_price': 2_120_000},
+    # КИТАЙСКИЕ (≈ 2.0–2.3 млн)
+    'Chery': {'models': ['Tiggo 4', 'Tiggo 7'], 'base_price': 2_100_000},
+    'Geely': {'models': ['Coolray', 'Atlas'], 'base_price': 2_200_000},
+    'Haval': {'models': ['Jolion', 'F7'], 'base_price': 2_150_000},
 
-        # Российские автомобили — средняя цена 723 000 руб [citation:2][citation:10]
-        'Lada': {'models': ['Vesta', 'Granta', 'Largus', 'Niva Travel'], 'segment': 'russian', 'base_price': 723_000},
-        'UAZ': {'models': ['Patriot', 'Hunter', 'Pickup', 'Profi'], 'segment': 'russian', 'base_price': 723_000}
+    # РОССИЙСКИЕ (≈ 700–900 тыс)
+    'Lada': {'models': ['Vesta', 'Granta'], 'base_price': 800_000},
+    'UAZ': {'models': ['Patriot'], 'base_price': 900_000}
     }
 
     # Цены на отдельные модели из отчетов Авто.ру (январь 2026) [citation:2][citation:10]
@@ -108,8 +101,26 @@ def generate_synthetic_data(n_samples=15000):
         # --- РАСЧЕТ ЦЕНЫ НА ОСНОВЕ ДАННЫХ АВТО.РУ ---
 
         # Корректировка по возрасту (падение стоимости ~10-12% в год)
-        age_factor = 0.89 ** age
+        # Амортизация (реально сейчас медленнее падает цена)
+        age_factor = 0.92 ** age
+
         price = base_price * age_factor
+
+        # Пробег (сильнее влияет)
+        price *= max(0.6, 1 - mileage / 300000)
+
+        # Состояние (важнее, чем раньше)
+        price *= (0.7 + condition / 15)
+
+        # Владельцы
+        price *= max(0.85, 1 - (owners_count - 1) * 0.02)
+
+        # ДТП (сильнее влияет)
+        if accident:
+            price *= 0.80
+
+        # Рыночный шум
+        price *= np.random.uniform(0.9, 1.1)
 
         # Корректировка по пробегу
         if mileage > 100000:
@@ -147,7 +158,27 @@ def generate_synthetic_data(n_samples=15000):
         # - У дилеров: 30-45 дней
         # - У частников: 45-90 дней
         # - Весной быстрее, зимой медленнее
+        if condition >= 8:
+            days_to_sell -= 10
+        elif condition <= 4:
+            days_to_sell += 20
 
+        # ДТП
+        if accident:
+            days_to_sell += 20
+
+        # Сезонность (сейчас сильнее влияет)
+        if 3 <= month <= 5:
+            days_to_sell -= 10
+        elif 11 <= month <= 2:
+            days_to_sell += 15
+
+        # Цена относительно рынка
+        if price > base_price:
+            days_to_sell += 10
+
+        # Ограничение
+        days_to_sell = int(max(3, min(180, days_to_sell)))
         # Базовый срок продажи (дней)
         if segment == 'chinese':
             # Китайские авто продаются чуть медленнее из-за насыщения рынка [citation:6]
