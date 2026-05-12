@@ -3,85 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoLiquid — Оценка ликвидности автомобиля</title>
+    <title>AutoLiquid — Оценка ликвидности автомобиля (Demo)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .card {
-            border-radius: 20px;
-            border: none;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        .result-card {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-radius: 15px;
-            padding: 20px;
-        }
-        .price {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #28a745;
-        }
-        .days {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #007bff;
-        }
-        .confidence-bar {
-            height: 8px;
-            background: #e0e0e0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .confidence-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #28a745, #20c997);
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; font-family: 'Segoe UI', sans-serif; }
+        .card { border-radius: 20px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .result-card { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 15px; padding: 20px; }
+        .price { font-size: 2.5rem; font-weight: bold; color: #28a745; }
+        .days { font-size: 2rem; font-weight: bold; color: #007bff; }
+        .confidence-bar { height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden; }
+        .confidence-fill { height: 100%; background: linear-gradient(90deg, #28a745, #20c997); border-radius: 4px; transition: width 0.5s ease; }
         .liquidity-high { background-color: #28a745; color: white; }
         .liquidity-medium { background-color: #ffc107; color: black; }
         .liquidity-low { background-color: #dc3545; color: white; }
-        .btn-primary {
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border: none;
-            padding: 12px 30px;
-            font-weight: bold;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-        .form-label {
-            font-weight: 600;
-            color: #333;
-        }
-        .loader {
-            display: none;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .feature-badge {
-            background: #e9ecef;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            margin: 3px;
-        }
+        .btn-primary { background: linear-gradient(90deg, #667eea, #764ba2); border: none; padding: 12px 30px; font-weight: bold; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .form-label { font-weight: 600; color: #333; }
+        .loader { display: none; border: 3px solid #f3f3f3; border-top: 3px solid #667eea; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -94,7 +34,7 @@
                             <i class="fas fa-car fa-3x text-primary mb-3"></i>
                             <h1 class="display-5 fw-bold">AutoLiquid</h1>
                             <p class="text-muted">Оценка стоимости и ликвидности автомобиля с пробегом</p>
-                            <p class="small text-muted">На основе машинного обучения и анализа реальных сделок</p>
+                            <span class="badge bg-warning text-dark mb-3">Демо-режим (работает без сервера)</span>
                         </div>
 
                         <form id="predictForm">
@@ -103,9 +43,11 @@
                                     <label class="form-label">Марка</label>
                                     <select class="form-select" id="brand" required>
                                         <option value="">Выберите марку</option>
-                                        {% for brand in brands %}
-                                        <option value="{{ brand }}">{{ brand }}</option>
-                                        {% endfor %}
+                                        <option value="Toyota">Toyota</option>
+                                        <option value="Hyundai">Hyundai</option>
+                                        <option value="Kia">Kia</option>
+                                        <option value="BMW">BMW</option>
+                                        <option value="Lada">Lada</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -119,11 +61,11 @@
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Год выпуска</label>
-                                    <input type="number" class="form-control" id="year" min="1990" max="2025" required>
+                                    <input type="number" class="form-control" id="year" min="1990" max="2025" value="2018" required>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Пробег (км)</label>
-                                    <input type="number" class="form-control" id="mileage" min="0" max="500000" required>
+                                    <input type="number" class="form-control" id="mileage" min="0" max="500000" value="80000" required>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Состояние (1-10)</label>
@@ -140,9 +82,10 @@
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Цвет</label>
                                     <select class="form-select" id="color" required>
-                                        {% for color in colors %}
-                                        <option value="{{ color }}">{{ color }}</option>
-                                        {% endfor %}
+                                        <option value="Белый">Белый</option>
+                                        <option value="Черный">Черный</option>
+                                        <option value="Серебристый">Серебристый</option>
+                                        <option value="Красный">Красный</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4 mb-3">
@@ -157,9 +100,9 @@
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Месяц продажи</label>
                                     <select class="form-select" id="month">
-                                        {% for i in months %}
-                                        <option value="{{ loop.index }}">{{ i }}</option>
-                                        {% endfor %}
+                                        <option value="1">Январь</option>
+                                        <option value="6">Июнь</option>
+                                        <option value="12">Декабрь</option>
                                     </select>
                                 </div>
                             </div>
@@ -167,15 +110,13 @@
                             <div class="mb-4">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="accident">
-                                    <label class="form-check-label" for="accident">
-                                        Автомобиль был в ДТП
-                                    </label>
+                                    <label class="form-check-label" for="accident">Автомобиль был в ДТП</label>
                                 </div>
                             </div>
 
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-chart-line me-2"></i>Рассчитать стоимость и ликвидность
+                                    <i class="fas fa-chart-line me-2"></i>Рассчитать (Демо)
                                 </button>
                             </div>
                         </form>
@@ -197,9 +138,7 @@
                                             <div class="confidence-bar">
                                                 <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
                                             </div>
-                                            <div class="small text-muted mt-1">
-                                                Уверенность прогноза: <span id="confidence">0</span>%
-                                            </div>
+                                            <div class="small text-muted mt-1">Уверенность прогноза: <span id="confidence">0</span>%</div>
                                         </div>
                                     </div>
                                     <div class="col-md-6 text-center">
@@ -228,24 +167,30 @@
     </div>
 
     <script>
+        // Захардкоженные данные для работы без сервера
+        const MODELS_BY_BRAND = {
+            'Toyota': ['Camry', 'Corolla', 'RAV4', 'Land Cruiser'],
+            'Hyundai': ['Solaris', 'Creta', 'Santa Fe', 'Tucson'],
+            'Kia': ['Rio', 'Sportage', 'Sorento', 'K5'],
+            'BMW': ['X5', 'X3', '5 Series', '3 Series'],
+            'Lada': ['Vesta', 'Granta', 'Largus', 'Niva']
+        };
+
         // Загрузка моделей при выборе марки
         document.getElementById('brand').addEventListener('change', function() {
             const brand = this.value;
             const modelSelect = document.getElementById('model');
 
             if (brand) {
-                fetch(`/get_models/${brand}`)
-                    .then(response => response.json())
-                    .then(models => {
-                        modelSelect.innerHTML = '<option value="">Выберите модель</option>';
-                        models.forEach(model => {
-                            const option = document.createElement('option');
-                            option.value = model;
-                            option.textContent = model;
-                            modelSelect.appendChild(option);
-                        });
-                        modelSelect.disabled = false;
-                    });
+                const models = MODELS_BY_BRAND[brand] || [];
+                modelSelect.innerHTML = '<option value="">Выберите модель</option>';
+                models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    modelSelect.appendChild(option);
+                });
+                modelSelect.disabled = false;
             } else {
                 modelSelect.innerHTML = '<option value="">Сначала выберите марку</option>';
                 modelSelect.disabled = true;
@@ -257,47 +202,48 @@
             document.getElementById('conditionValue').textContent = this.value;
         });
 
-        // Обработка формы
-        document.getElementById('predictForm').addEventListener('submit', async function(e) {
+        // Симуляция расчета
+        document.getElementById('predictForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // Проверка заполнения
             if (!document.getElementById('model').value) {
                 alert('Пожалуйста, выберите модель автомобиля');
                 return;
             }
 
-            const formData = new FormData();
-            formData.append('brand', document.getElementById('brand').value);
-            formData.append('model', document.getElementById('model').value);
-            formData.append('year', document.getElementById('year').value);
-            formData.append('mileage', document.getElementById('mileage').value);
-            formData.append('condition', document.getElementById('condition').value);
-            formData.append('color', document.getElementById('color').value);
-            formData.append('owners_count', document.getElementById('owners_count').value);
-            formData.append('accident', document.getElementById('accident').checked ? 1 : 0);
-            formData.append('month', document.getElementById('month').value);
-
             // Показать загрузчик
             document.getElementById('loader').style.display = 'block';
             document.getElementById('result').style.display = 'none';
 
-            try {
-                const response = await fetch('/predict', {
-                    method: 'POST',
-                    body: formData
-                });
+            // Имитируем задержку сети сервера (1.5 секунды)
+            setTimeout(() => {
+                // Генерация случайных "правдоподобных" данных для демо
+                const basePrice = Math.floor(Math.random() * (3000000 - 500000) + 500000);
+                const confidenceVal = Math.floor(Math.random() * (95 - 75) + 75);
+                const daysToSell = Math.floor(Math.random() * 60) + 5;
 
-                const data = await response.json();
+                const data = {
+                    price: basePrice,
+                    price_lower: Math.floor(basePrice * 0.9),
+                    price_upper: Math.floor(basePrice * 1.1),
+                    confidence: confidenceVal,
+                    days_to_sell: daysToSell,
+                };
 
-                if (data.error) {
-                    alert('Ошибка: ' + data.error);
-                    return;
+                if (daysToSell <= 14) {
+                    data.liquidity = 'Высокая';
+                    data.liquidity_description = 'Автомобиль пользуется большим спросом';
+                } else if (daysToSell <= 30) {
+                    data.liquidity = 'Средняя';
+                    data.liquidity_description = 'Стандартный срок продажи для рынка';
+                } else {
+                    data.liquidity = 'Низкая';
+                    data.liquidity_description = 'Специфичный автомобиль, потребуется время';
                 }
 
                 // Обновление интерфейса
                 document.getElementById('price').textContent = new Intl.NumberFormat('ru-RU').format(data.price) + ' ₽';
-                document.getElementById('priceRange').textContent =
+                document.getElementById('priceRange').textContent = 
                     `Диапазон: ${new Intl.NumberFormat('ru-RU').format(data.price_lower)} - ${new Intl.NumberFormat('ru-RU').format(data.price_upper)} ₽`;
                 document.getElementById('confidence').textContent = data.confidence;
                 document.getElementById('confidenceFill').style.width = data.confidence + '%';
@@ -317,27 +263,17 @@
                 // Рекомендация
                 let recommendation = '';
                 if (data.days_to_sell <= 14) {
-                    recommendation = `Ваш автомобиль обладает высокой ликвидностью. Рекомендуемая цена — ${new Intl.NumberFormat('ru-RU').format(data.price)} ₽.
-                                      Если вам нужно продать быстрее, можно выставить цену на 3-5% ниже рыночной.`;
+                    recommendation = `Ваш автомобиль обладает высокой ликвидностью. Рекомендуемая цена — ${new Intl.NumberFormat('ru-RU').format(data.price)} ₽.`;
                 } else if (data.days_to_sell <= 30) {
-                    recommendation = `Автомобиль продастся в средние сроки. Цена адекватна рынку.
-                                      Для ускорения продажи рекомендуем сделать качественные фото и подробное описание.`;
-                } else if (data.days_to_sell <= 60) {
-                    recommendation = `Рекомендуем снизить цену на 5-10% или провести предпродажную подготовку.
-                                      Особое внимание уделите истории обслуживания автомобиля.`;
+                    recommendation = `Автомобиль продастся в средние сроки. Цена адекватна рынку. Для ускорения сделайте качественные фото.`;
                 } else {
-                    recommendation = `Автомобиль может продаваться долго. Рекомендуем существенно пересмотреть цену
-                                      (снижение на 10-20%) или рассмотреть продажу через трейд-ин.`;
+                    recommendation = `Автомобиль может продаваться долго. Рекомендуем пересмотреть цену или рассмотреть трейд-ин.`;
                 }
                 document.getElementById('recommendation').textContent = recommendation;
 
-                document.getElementById('result').style.display = 'block';
-
-            } catch (error) {
-                alert('Ошибка при получении данных: ' + error.message);
-            } finally {
                 document.getElementById('loader').style.display = 'none';
-            }
+                document.getElementById('result').style.display = 'block';
+            }, 1500); // Конец имитации задержки
         });
     </script>
 </body>
